@@ -1,0 +1,21 @@
+-- undesigned tempaltes
+- myposts.html
+- savedposts.html
+- homepage
+
+-- added
+- multiple css styles
+- emojis
+
+-- added functionalities
+- myposts
+- myreplies
+- savedposts
+- flash-messages
+
+-- added functions to simplify
+- insert_into_posts()
+- insert_into_users()
+- insert_into_replies()
+- get_user_uuid()
+- get_uploaded_file()

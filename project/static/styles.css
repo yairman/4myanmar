@@ -1,0 +1,215 @@
+.replies-list {
+    display: grid;
+}
+
+.reply {
+    display: flex;
+}
+
+.boards {
+    display: flex;
+    justify-content: center;
+}
+
+.board-list {
+    display: grid;
+    grid: auto/ auto auto auto auto;
+    padding: 15px;
+}
+
+.intro-gif, .header-list, .navigation-bar, .header-image, .title, .alert, .new-thread-toggler {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.new-thread-toggler {
+    margin-bottom: 30px;
+}
+
+.replies {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    flex-wrap: nowrap;
+}
+
+.post-info, .post-info-buttons, .vote-counts {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: left;
+}
+
+.post-info, .new-post-form {
+    margin-top: 10px;
+    border-radius: 15px;
+    border: 2px solid #73AD21;
+    padding: 10px;
+    background-color: #1c1600;
+}
+
+.new-post-form {
+    border-bottom: 2px solid #73AD21;
+}
+
+button {
+    display: inline-block;
+    padding: 5px 15px;
+    font-size: 10px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #ffffff;
+    border: none;
+    background-color: #04AA6D;
+    border-radius: 15px;
+
+}
+
+button:hover {
+    background-color: #3e8e41;
+}
+
+button:active {
+    background-color: #1d4d1f;
+    transform: translateY(3px);
+}
+
+img {
+    max-width: 300px;
+    height: auto;
+    border-radius: 20px;
+    border: 2px solid #73AD21;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+input[type=text], input::file-selector-button {
+    border: 1px solid #73AD21;
+    border-radius: 5px;
+    margin: 5px;
+    font-size: 16px;
+    padding-top: 0px;
+    background-color: black;
+    color: white;
+    transition: border 0.3s ease-in-out;
+}
+
+input::file-selector-button {
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+input::file-selector-button:hover {
+    background-color: #47873e;
+}
+
+input[type=text]:hover {
+    border: 1px solid #9aeb2a;
+}
+
+input[type=text]:hover {
+    width: 90%;
+    border: 1px solid #9aeb2a;
+}
+
+input[type=text]::placeholder {
+    font-size: 12px;
+    line-height: normal;
+    vertical-align: top;
+    text-align: left;
+}
+
+
+.post-info > div {
+    margin-top: 10px;
+    text-align: left;
+    font-size: 12px;
+}
+
+.post-info-buttons > div {
+    margin: 2px;
+    margin-top: 0px;
+    margin-left: 1px;
+}
+
+.vote-counts > div {
+    margin-right: 5px;
+    margin-top: -15px;
+}
+
+.header-list > div {
+    width: 50px;
+    margin: 5px;
+    text-align: center;
+    line-height: 12px;
+    font-size: 12px;
+}
+
+li {
+    list-style-type: none;
+}
+
+li a {
+    text-decoration: none;
+    color: white;
+    margin: 35px;
+}
+
+.navigation-bar > div {
+    margin: 10px;
+    text-align: center;
+    line-height: 20px;
+    font-size: 15px;
+    text-decoration: none;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+body {
+    margin: auto;
+    background-color: #0a0801;
+    color: white;
+    text-align: left;
+    padding: 2rem 1rem;
+    width: 58rem;
+}
+
+/* asked chatGPT to truncate long content */
+.text-container {
+    position: relative;
+    max-width: 870px
+}
+
+.text-content {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.text-expanded .text-content {
+    white-space: normal;
+    overflow: visible;
+}
+
+.read-more {
+    display: block;
+    cursor: pointer;
+    color: red;
+    text-decoration: none;
+}
+
+footer {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    color: grey;
+}

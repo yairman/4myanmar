@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <h3>Choose Board</h3>
+{% endblock %}
+
+{% block main %}
+
+    <div class="boards">
+        <ul class="board-list">
+            {% for board in boards %}
+                <div>
+                    <li><a href="/{{ board }}">{{ board }}</a></li>
+                </div>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="intro-gif">
+            <img src="static/aesthetic-typing.gif">
+    </div>
+
+
+
+{% endblock %}

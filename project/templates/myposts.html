@@ -1,0 +1,303 @@
+{% extends "layout.html" %}
+
+{% block head %}
+            {% if head_list_show %}
+                <ul class="header-list">
+                    {% for board in boards %}
+                        <div>
+                            <li><a href="/{{ board }}">/{{ board }}</a></li>
+                        </div>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+{% endblock %}
+
+
+{% block title %}
+    <h2 class="mt-3">my posts</h2>
+{% endblock %}
+
+{% block main %}
+    {% if allow_new_thread %}
+        <div>
+            <span class="new-thread-toggler" onclick="toggleForm(this);">
+                <button class="new-thread-btn">Start a new thread</button>
+            </span>
+            <div class="new-post-form" style="display: none;">
+                <form action="/{{board_title}}" method="post" enctype="multipart/form-data">
+                    <div>
+                        <input type="text" name="title" placeholder="title" required autocomplete="off">
+                    </div>
+                    <div>
+                        <input type="text" name="content" placeholder="Content" autocomplete="off">
+                    </div>
+                    <div>
+                        <input type="file" name="file" accept="image/*, .mp4, .gif, .webp">
+                    </div>
+                    <div>
+                        <button type="submit" value="Upload">&#128238; Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+
+
+    <div>
+        {% if posts %}
+            {% for post in posts %}
+                <div class="post-info">
+                    <div>
+                        <h3>{{ post['title'] }}</h3>
+                        <p style="font-size: 8px;">&#128336;{{ post['timestamp'] }}</p>
+                        <div class="vote-counts">
+                            <div>
+                                <span>&#128512;</span>
+                            </div>
+                            <div>
+                                <p id="upvote-count-{{post['id']}}">{{ post['upvotes'] }}</p>
+                            </div>
+                            <div>
+                                <span>&#128533;</span>
+                            </div>
+                            <div>
+                                <p id="downvote-count-{{post['id']}}">{{ post['downvotes'] }}</p>
+                            </div>
+                        </div>
+                        <!--asked chatGPT for advice and adjusted-->
+                        <div class="text-container" id="post-{{post['id']}}">
+                            <div class="text-content">
+                                {% if post['content']|length > 100 %}
+                                    <a href="#" class="read-more" onclick="toggleText('post-{{post['id']}}'); return false;">Read more</a>
+                                {% endif %}
+                                <p style="font-size: 15px; margin-top: -5px;">{{ post['content'] }}</p>
+                            </div>
+                        </div>
+                        {% if post['filename'] %}
+                            <img src="/{{ post['filepath'] }}">&#128444; {{ post['filename'] }}</a>
+                        {% endif %}
+                        {% if session['passkey'] %}
+                            <div class="row">
+                                <div class="post-info-buttons">
+                                    {% if post['isVotedByMe'] %}
+                                        <div>
+                                            <button id="undo_upvote-{{ post['id'] }}" style="display: block;">&#128077; Undo Upvote</button>
+                                            <button id="upvote-{{ post['id'] }}" style="display: none;">&#128077; Upvote</button>
+                                        </div>
+                                    {% else %}
+                                        <div>
+                                            <button id="upvote-{{ post['id'] }}" style="display: block;">&#128077; Upvote</button>
+                                            <button id="undo_upvote-{{ post['id'] }}" style="display: none;">&#128077; Undo Upvote</button>
+                                        </div>
+                                    {% endif %}
+                                    {% if post['isDownvotedByMe'] %}
+                                        <div>
+
+                                            <button id="downvote-{{ post['id'] }}" style="display: none;">&#128078; Downvote</button>
+                                            <button id="undo_downvote-{{ post['id'] }}" style="display: block;">&#128078; Undo Downvote</button>
+                                        </div>
+
+                                    {% else %}
+                                        <div>
+                                            <button id="downvote-{{ post['id'] }}" style="display: block;">&#128078; Downvote</button>
+                                            <button id="undo_downvote-{{ post['id'] }}" style="display: none;">&#128078; Undo Downvote</button>
+                                        </div>
+                                    {% endif %}
+
+
+                                    {% if post['savedByMe'] %}
+                                        <div>
+                                            <button id="save-{{ post['id'] }}" style="display: none;">&#128188; Save Post</button>
+                                            <button id="unsave-{{ post['id'] }}" style="display: block;">&#128465; Unsave post</button>
+                                        </div>
+                                    {% else %}
+                                        <div>
+                                            <button id="unsave-{{ post['id'] }}" style="display: none;">&#128465; Unsave post</button>
+                                            <button id="save-{{ post['id'] }}" style="display: block;">&#128188; Save Post</button>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <div id="pre-reply-button-{{ post['id'] }}">
+                                            <button onclick="reply_toggler('{{ post['id'] }}')" style="display: block;">&#128228; Reply</button>
+                                        </div>
+
+                                        <div id="reply-form-{{ post['id'] }}" style="display: none;">
+                                            <!--one issue is that the user will be redirected to the board of the post he/she replied to-->
+                                            <form method="post" action="/reply" enctype="multipart/form-data">
+                                                <input type="hidden" name="reply_post_id" value="{{ post['id'] }}">
+
+                                                <!--for my posts, you need to get current post's board_name to reply-->
+                                                <input type="hidden" name="board_name" value="{{ post['board_name'] }}">
+
+                                                <input type="text" name="reply" placeholder="reply" autofocus autocomplete="off">
+                                                <input type="file" name="file" accept="image/*, .mp4, .gif, .webp">
+                                                <button type="submit" value="Upload">&#128228; Reply</button>
+                                            </form>
+                                            <button onclick="close_reply_form({{ post['id'] }})">&#128293; Close</button>
+                                        </div>
+                                    </div>
+                                    {% if replies %}
+                                        <span>
+                                            <button onclick="togglereplies('{{post['id']}}');" id="see-replies-button-{{post['id']}}">see replies</button>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div id="replies-{{post['id']}}" style="display:none;">
+                                    {% for reply in replies %}
+                                        {% if reply['reply_post_id'] == post['id'] %}
+                                            <div>
+                                                <div>
+                                                    <h3>{{ reply['reply'] }}</h3>
+                                                    <p style="font-size: 8px;">{{ reply['timestamp'] }}</p>
+                                                    <br>
+                                                    {% if reply['filename'] %}
+                                                        <img src="/{{ reply['filepath'] }}">&#128444;{{ reply['filename'] }}</a>
+                                                    {% endif %}
+                                                    <br>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {%endif %}
+                    </div>
+                </div>
+                    <script>
+
+                        function togglereplies(postId) {
+                            const replies = document.getElementById('replies-'+postId);
+                            const btn = document.getElementById('see-replies-button-'+postId);
+
+                            // Toggle the display between 'flex' and 'none'
+                            if (replies.style.display === 'none' || replies.style.display === '') {
+                                replies.style.display = 'grid';
+                                btn.textContent = 'close replies';
+                            } else {
+                                replies.style.display = 'none';
+                                btn.textContent = 'See replies';
+                            }
+                        };
+                        document.addEventListener('DOMContentLoaded', function() {
+                            document.getElementById("save-{{ post['id'] }}").addEventListener("click", function() {
+                                document.getElementById("save-{{post['id']}}").style.display = 'none';
+                                document.getElementById("unsave-{{post['id']}}").style.display = 'block';
+                                savePost({{post['id']}});
+                            })
+
+                            document.getElementById("unsave-{{ post['id'] }}").addEventListener("click", function() {
+                                document.getElementById("unsave-{{post['id']}}").style.display = 'none';
+                                document.getElementById("save-{{post['id']}}").style.display = 'block';
+                                unsavePost({{post['id']}});
+                            })
+
+                            document.getElementById("upvote-{{ post['id'] }}").addEventListener('click', function() {
+                                document.getElementById("upvote-{{ post['id'] }}").style.display = 'none';
+                                document.getElementById("undo_upvote-{{ post['id'] }}").style.display = 'block';
+                                // Add your upvote logic here
+                                updateVote({{post['id']}}, 'upvote');
+                            })
+
+                            document.getElementById('downvote-{{ post['id'] }}').addEventListener('click', function() {
+                                document.getElementById('downvote-{{ post['id'] }}').style.display = 'none';
+                                document.getElementById('undo_downvote-{{ post['id'] }}').style.display = 'block';
+                                // Add your downvote logic here
+                                updateVote({{post['id']}}, 'downvote');
+                            })
+
+                            document.getElementById('undo_upvote-{{ post['id'] }}').addEventListener('click', function() {
+                                document.getElementById('undo_upvote-{{ post['id'] }}').style.display = 'none';
+                                document.getElementById('upvote-{{ post['id'] }}').style.display = 'block';
+                                // Add your undo upvote logic here
+                                updateVote({{post['id']}}, 'undo_upvote');
+                            })
+
+                            document.getElementById('undo_downvote-{{ post['id'] }}').addEventListener('click', function() {
+                                document.getElementById('undo_downvote-{{ post['id'] }}').style.display = 'none';
+                                document.getElementById('downvote-{{ post['id'] }}').style.display = 'block';
+                                // Add your undo downvote logic here
+                                updateVote({{post['id']}}, 'undo_downvote');
+                            })
+                        });
+
+                        function updateVote(postID, action) {
+                            fetch(`/vote/${postID}/${action}`, {
+                                method: 'POST'
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                // Assuming 'data' contains the updated vote counts
+                                document.getElementById(`upvote-count-${postID}`).textContent = data.upvotes;
+                                document.getElementById(`downvote-count-${postID}`).textContent = data.downvotes;
+                            })
+                            .catch(error => console.error('Error:', error));
+                        };
+
+                        function savePost(postID) {
+                            fetch(`/savepost/${postID}`, {
+                                method: 'POST'
+                            })
+                        };
+
+                        function unsavePost(postID) {
+                            fetch(`/unsavepost/${postID}`, {
+                                method: 'POST'
+                            })
+                        };
+
+
+
+                        function toggleText(postId) {
+                            const textContainer = document.getElementById(postId);
+                            const readMoreLink = textContainer.querySelector('.read-more');
+                            const textContent = textContainer.querySelector('.text-content');
+
+                            if (textContainer.classList.contains('text-expanded')) {
+                                textContainer.classList.remove('text-expanded');
+                                readMoreLink.textContent = 'Read more';
+                            } else {
+                                textContainer.classList.add('text-expanded');
+                                readMoreLink.textContent = 'Read less';
+                            }
+                        }
+                        function toggleForm(element) {
+                            const form = element.parentElement.querySelector('.new-post-form');
+                            const btn = element.parentElement.querySelector('.new-thread-btn');
+
+
+                            // Toggle the display between 'flex' and 'none'
+                            if (form.style.display === 'none' || form.style.display === '') {
+                                form.style.display = 'flex';
+                                btn.textContent = 'close';
+                            } else {
+                                form.style.display = 'none';
+                                btn.textContent = 'Start a new thread';
+                            }
+                        };
+
+                    </script>
+
+
+
+            {% endfor %}
+        {% endif %}
+    </div>
+    <script>
+        function reply_toggler(postID) {
+            let preReplyBtn = document.getElementById("pre-reply-button-" + postID);
+            let replyForm = document.getElementById("reply-form-" + postID);
+            if (replyForm.style.display == "none") {
+                replyForm.style.display = "block";
+                preReplyBtn.style.display = "none";
+            }
+        };
+
+        function close_reply_form(postID) {
+            document.getElementById("reply-form-" + postID).style.display = "none";
+            document.getElementById("pre-reply-button-" + postID).style.display = "block";
+        };
+
+    </script>
+{% endblock %}
